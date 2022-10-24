@@ -9,14 +9,17 @@ use Illuminate\Support\Facades\DB;
 class bukuController extends Controller
 {
     public function index(){
-        $data_buku = Buku::all()->sortByDesc('id');
-        $no = 0;
-        return view('index', compact('data_buku','no'));
+        $batas = 5;
+        $jumlah_buku = Buku::count();
+        $data_buku = Buku::orderBy('id', 'desc')->paginate($batas);
+        // $data_buku = DB::table('buku')->paginate(5);
+        $no = $batas * ($data_buku->currentPage() - 1);
+        return view('index', compact('data_buku','no', 'jumlah_buku'));
     }
 
-        public function create(){
-            return view('create');
-        }
+    public function create(){
+        return view('create');
+    }
 
     public function store(Request $request){
         // $request->validate([
@@ -25,28 +28,34 @@ class bukuController extends Controller
         // $buku = Buku::findOrFail($request);
         // $buku->get($request->all());
         
-        // $buku = new Buku;
-        // $buku->judul = $request->judul;
-        // $buku->penulis = $request->penulis;
-        // $buku->harga = $request->harga;
-        // $buku->tgl_terbit = $request->tgl_terbit;
-        // $buku->save();
+        
         // return redirect('/buku');
 
-        DB::table('buku')->insert([
-            'judul' => $request->judul,
-            'penulis' => $request->penulis,
-            'harga' => $request->harga,
-            'tgl_terbit' => $request->tgl_terbit
-        ]);    
-        return redirect('/buku');
+        // DB::table('buku')->insert([
+        //     'judul' => $request->judul,
+        //     'penulis' => $request->penulis,
+        //     'harga' => $request->harga,
+        //     'tgl_terbit' => $request->tgl_terbit
+        // ]);    
+        $this->validate($request, [
+            'judul' => 'required|string',
+            'penulis' => 'required|string|max:30',
+            'harga' => 'required|numeric',
+            'tgl_terbit' => 'required|date'
+        ]);
+        $buku = new Buku;
+        $buku->judul = $request->judul;
+        $buku->penulis = $request->penulis;
+        $buku->harga = $request->harga;
+        $buku->tgl_terbit = $request->tgl_terbit;
+        $buku->save();
+        return redirect('/buku')->with('pesan', 'Data Buku Berhasil di Tambah');
     }
 
     public function destroy($id){
         $buku = Buku::find($id);
         $buku->delete();
-        return redirect('/buku');
-
+        return redirect('/buku')->with('pesan', 'Data Buku Berhasil di Hapus');
     }
 
     // public function hapus($id){
@@ -66,6 +75,16 @@ class bukuController extends Controller
             'harga' => $request->harga,
             'tgl_terbit' => $request->tgl_terbit
         ]);
-        return redirect('/buku');
+        return redirect('/buku')->with('pesan', 'Data Buku Berhasil di Simpan');
+    }
+
+    public function search(Request $request){
+        $batas = 5;
+        $cari = $request->kata;
+        $data_buku = Buku::where('judul', 'like', "%".$cari."%")->orwhere('penulis', 'like', "%".$cari."%")->paginate($batas);
+        $jumlah_buku = $data_buku->count();
+        
+        $no = $batas * ($data_buku->currentPage() - 1);
+        return view('/search', compact('jumlah_buku', 'no', 'data_buku', 'cari'));
     }
 }

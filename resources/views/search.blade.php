@@ -3,8 +3,13 @@
 <form action="{{ route('buku.search') }}" method="GET">
     @csrf
     <input type="text" name="kata" class="form-control" placeholder="cari..." style="width: 30%;
-    display: inline; margin-top: 10px; margin-bottom: 10px; margin-left: 30px;">
+    display: inline; margin-top: 10px; margin-bottom: 10px; float: right;">
 </form>
+
+@if(count($data_buku))
+<div class="alert alert-success"> Ditemukan <strong>{{ count($data_buku) }}</strong>
+    data dengan kata: <strong>{{ $cari }}</strong>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -27,7 +32,7 @@
                 <td>{{ $buku->judul }}</td>
                 <td>{{ $buku->penulis }}</td>
                 <td>{{ "Rp ".number_format($buku->harga, 2, ',','.') }}</td>
-                <td>{{ $buku->tgl_terbit->format('d/m/y')}}</td>
+                <td>{{ $buku->tgl_terbit->format('d/m/Y')}}</td>
                 <td>
                     <form action="{{ route('buku.update', $buku->id) }}" method="PUT">
                         @csrf
@@ -45,10 +50,15 @@
     </tbody>
 </table>
 
-<div>{{ $data_buku->links('pagination::bootstrap-4') }}</div>
-Halaman : {{ $data_buku->currentPage() }} <br/>
-Data Per Halaman : {{ $data_buku->perPage() }} <br/>
-<div><strong>Jumlah Buku: {{ $jumlah_buku }}</strong></div>
+@else
+    <div class="alert alert-warning"><h4>Data {{ $cari }} Tidak Ditemukan</h4>
+        <a href="/buku" class="btn btn-warning"></a>Kembali
+    </div>
+@endif
+
+
+{{-- <div>{{ $data_buku->links() }}</div>
+<div><strong>Jumlah Buku: {{ $jumlah_buku }}</strong></div> --}}
 
 
 <p><a class="btn btn-primary m-4" href="{{ route('buku.create') }}">Tambah Buku</a></p>
