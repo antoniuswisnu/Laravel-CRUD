@@ -1,12 +1,17 @@
+@extends('layouts.app')
+@section('content')
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 
-<form action="{{ route('buku.search') }}" method="GET">
+<h5 class="display-5 text-center mb-4">CRUD BUKU</h5>
+
+<form class="mx-5 mb-4" action="{{ route('buku.search') }}" method="GET">
     @csrf
-    <input type="text" name="kata" class="form-control" placeholder="cari..." style="width: 30%;
-    display: inline; margin-top: 10px; margin-bottom: 10px; margin-left: 30px;">
+    <input class="search" type="text" name="kata" class="form-control" placeholder="cari..." >
 </form>
 
-<table class="table table-striped">
+
+<table class="table table-striped mx-5" >
     <thead>
         <tr>
             <th>No</th>
@@ -14,13 +19,18 @@
             <th>Penulis</th>
             <th>Harga</th>
             <th>Tgl. Terbit</th>
+            <th>Like</th>
+            @if(Auth::check() && Auth::user()->level == 'admin')
             <th>Aksi</th>
+            @endif
         </tr>
     </thead>
     <tbody>
+
         @if(Session::has('pesan'))
             <div class="alert alert-success">{{ Session::get('pesan') }}</div>
         @endif
+
         @foreach($data_buku as $buku)
             <tr>
                 <td>{{ ++$no }}</td>
@@ -28,30 +38,37 @@
                 <td>{{ $buku->penulis }}</td>
                 <td>{{ "Rp ".number_format($buku->harga, 2, ',','.') }}</td>
                 <td>{{ $buku->tgl_terbit->format('d/m/y')}}</td>
+
                 <td>
-                    <form action="{{ route('buku.update', $buku->id) }}" method="PUT">
+                    <a href="{{ route('buku.suka', $buku->id )}}" class="btn btn-primary btn-sm">
+                        <i class="fa fa-thumbs-up"></i>Like
+                        <span class="badge badge-light">{{$buku->suka}}</span>
+                    </a>
+                </td>
+                
+                @if(Auth::check() && Auth::user()->level == 'admin')
+                <td>
+                    
+                    <form method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-primary">update</button>
-                        
-                    </form>
-                    <form action="{{ route('buku.destroy', $buku->id) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin Mau Dihapus?')">delete</button>
-                        {{-- @method('PUT') --}}
+                        <a class="mx-1" href="{{ route('buku.detail', $buku->buku_seo )}}"><i class="btn btn-outline-primary">Detail</i></a>
+                        <a class="mx-1" href="{{ route('buku.edit', $buku->id )}}"><i class="btn btn-primary">Edit</i></a>
+                        <a class="mx-1" href="{{ route('buku.destroy', $buku->id )}}"><i class="btn btn-danger">Hapus</i></a>
                     </form>
                 </td>
+                @endif
+
             </tr>
         @endforeach
     </tbody>
-</table>
+</table> 
 
-<div>{{ $data_buku->links('pagination::bootstrap-4') }}</div>
-Halaman : {{ $data_buku->currentPage() }} <br/>
-Data Per Halaman : {{ $data_buku->perPage() }} <br/>
-<div><strong>Jumlah Buku: {{ $jumlah_buku }}</strong></div>
+<div class="mx-5">{{$data_buku->links('pagination::bootstrap-4')}}</div>
 
+@if(Auth::check() && Auth::user()->level == 'admin')
+<p><a class="btn btn-primary mx-5" href="{{ route('buku.create') }}">Tambah Buku</a></p>
+<h5 class="mx-5">Jumlah Buku : {{ $data_buku->count('id') }}</h5>
+<p class="mx-5">Jumlah Total Harga Buku : {{ " Rp ".number_format($data_buku->sum('harga')) }} </p>
+@endif
 
-<p><a class="btn btn-primary m-4" href="{{ route('buku.create') }}">Tambah Buku</a></p>
-
-<h5 class=" mx-4">Jumlah Data : {{ $data_buku->count('id') }}</h5>
-<p class=" m-4">Jumlah Total Harga Buku : {{ " Rp ".number_format($data_buku->sum('harga')) }} </p>
+@endsection

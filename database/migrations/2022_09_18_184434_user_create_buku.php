@@ -17,10 +17,14 @@ return new class extends Migration
             $table->id();
             $table->string('judul');
             $table->string('penulis');
+            $table->string('buku_seo');
             $table->integer('harga');
+            $table->integer('suka')->default(0);
             $table->date('tgl_terbit');
             $table->timestamps();
         });
+
+
     }
 
     /**
@@ -30,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        // Schema::dropIfExists('buku');
     }
 };

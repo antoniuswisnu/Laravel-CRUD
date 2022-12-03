@@ -1,7 +1,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
 integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 
-<h4>Edit Buku</h4>
+<h5 class="display-5 text-center mx-4 my-4">Edit Buku</h5>
 
 @foreach($data_buku as $buku)
     <form method="POST" action="{{ route('buku.update', $buku->id) }}" class="m-4">

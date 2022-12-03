@@ -35,6 +35,7 @@
       <label >Tgl. Terbit</label>
       <input type="text" id="datepicker" class="form-control" name="tgl_terbit" placeholder="yyyy/mm/dd"  >
     </div>
+    
     <button href="/buku" type="submit" class="btn btn-primary mt-4">Submit</button>
     <a href="/buku" class="btn btn-danger mt-4">Batal</a>
 </form>
